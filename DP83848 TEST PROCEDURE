@@ -1,0 +1,51 @@
+#include "lwip.h"
+#include "dp83848.h"
+
+//Dp838484 test Variables
+
+extern dp83848_Object_t DP83848;
+extern dp83848_IOCtx_t  IO;
+uint32_t phy_reg_val[10];
+int32_t *read_reg;
+int32_t *write_reg;
+
+
+// DP83848  HEALTH CHECK
+
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, DP83848_PHYI1R, &phy_reg_val[0]);
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, DP83848_PHYI2R, &phy_reg_val[1]);
+
+  //BIST START  (BUILT IN SELF TEST START)
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[2]);
+  phy_reg_val[3] = phy_reg_val[2] | 0x0100; //BIST START
+  *write_reg = DP83848.IO.WriteReg(DP83848.DevAddr, 0x19, phy_reg_val[3]);
+  HAL_Delay(10);
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[4]);
+
+  //BIST STop   (BUILT IN SELF TEST STOP)
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[2]);
+  phy_reg_val[3] = phy_reg_val[2] & ~(0x0100); //BIST STop
+  *write_reg = DP83848.IO.WriteReg(DP83848.DevAddr, 0x19, phy_reg_val[3]);
+  HAL_Delay(10);
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[4]);
+
+  //loopback enable  (INTERNAL LOOPBACK ENABLE)
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x00, &phy_reg_val[5]);
+  phy_reg_val[6] = phy_reg_val[5] | 0x4000; //loopback enable
+  *write_reg = DP83848.IO.WriteReg(DP83848.DevAddr, 0x00, phy_reg_val[6]);
+  HAL_Delay(10);
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x00, &phy_reg_val[7]);
+
+  //BIST START
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[2]);
+  phy_reg_val[3] = phy_reg_val[2] | 0x0100; //BIST START
+  *write_reg = DP83848.IO.WriteReg(DP83848.DevAddr, 0x19, phy_reg_val[3]);
+  HAL_Delay(10);
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[4]);
+
+  //BIST STop
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[2]);
+  phy_reg_val[3] = phy_reg_val[2] & ~(0x0100); //BIST STop
+  *write_reg = DP83848.IO.WriteReg(DP83848.DevAddr, 0x19, phy_reg_val[3]);
+  HAL_Delay(10);
+  *read_reg = DP83848.IO.ReadReg(DP83848.DevAddr, 0x19, &phy_reg_val[4]);
